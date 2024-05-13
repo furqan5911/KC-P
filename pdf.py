@@ -1,33 +1,20 @@
 from PyPDF2 import PdfReader
 import streamlit as st
-from docx import Document
+from  docx import Document
 import google.generativeai as genai
 
-# Load Google API key from secrets.toml
-google_api_key = st.secrets["GOOGLE_API_KEY"]
-# Configure genai with Google API key
-genai.configure(api_key=google_api_key)
-
-temperature = 0.9
-
-generation_config = {
-    "temperature": temperature,
-    "top_p": 0.95,
-    "top_k": 1,
-    "max_output_tokens": 99998,
-}
-
-# Function to extract text from PDF
-def get_pdf_text(pdf_docs):
-    text = ""
-    for pdf in pdf_docs:
-        pdf_reader = PdfReader(pdf)
-        for page in pdf_reader.pages:
-            text += page.extract_text()
-    return text
-
 # Function to generate a modification prompt and get response from generative model
-def generate_prompt_and_get_response(resume_text, job_category):
+def generate_prompt_and_get_response(resume_text, job_category, api_key):
+    genai.configure(api_key=api_key)
+    
+    temperature = 0.9
+    generation_config = {
+        "temperature": temperature,
+        "top_p": 0.95,
+        "top_k": 1,
+        "max_output_tokens": 99998,
+    }
+    
     prompt = f"Modify the following resume to better fit the job category '{job_category}':\n\n{resume_text}\n\nTry to format the response in a way that is suitable for a Word document."
     response = get_response(prompt)
     return response
@@ -71,11 +58,13 @@ def main():
     ]
     job_category = st.selectbox("Select Job Category", job_categories)
     
+    api_key = st.text_input("Enter your API key")
+    
     if st.button("Generate Modification Prompt"):
         # Generate modification prompt and get response
         if uploaded_file and 'resume_text' in locals():
             # Pass extracted text as prompt
-            response_text = generate_prompt_and_get_response(resume_text, job_category)
+            response_text = generate_prompt_and_get_response(resume_text, job_category, api_key)
             st.text_area("Modification Prompt", response_text, height=150)
             
             # Create Word document with response text
