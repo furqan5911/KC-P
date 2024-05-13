@@ -16,7 +16,7 @@ def generate_prompt_and_get_response(resume_text, job_category, api_key):
     }
     
     prompt = f"Modify the following resume to better fit the job category '{job_category}':\n\n{resume_text}\n\nTry to format the response in a way that is suitable for a Word document."
-    response = get_response(prompt)
+    response = get_response(prompt, generation_config)
     return response
 
 # Function to create a Word document with response text
@@ -25,7 +25,7 @@ def create_word_document(response_text):
     doc.add_paragraph(response_text)
     doc.save('modification_prompt.docx')
 
-def get_response(prompt, model="gemini-pro"):
+def get_response(prompt, generation_config, model="gemini-pro"):
     model = genai.GenerativeModel(model)
     res = model.generate_content(prompt, generation_config=generation_config)
     return res.text
