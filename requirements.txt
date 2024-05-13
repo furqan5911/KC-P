@@ -1,7 +1,8 @@
 streamlit
 PyPDF2
-dotenv
+os
 docx
 pytesseract
 PIL
 google-generativeai
+dotenv
